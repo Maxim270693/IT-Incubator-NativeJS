@@ -1,3 +1,5 @@
+import {start} from "repl";
+
 console.log('lesson 2');
 
 // Lexical environment
@@ -24,6 +26,14 @@ console.log('lesson 2');
 // Task 01
 // Реализовать функцию sum которая суммирует 2 числа следующим образом sum(3)(6) === 9
 
+function sum(n: number) {
+    return function(n2: number) {
+        return n + n2
+    }
+}
+
+console.log(sum(3)(9))
+
 // Task 02
 // Реализовать функцию makeCounter которая работает следующим образом:
 // const counter = makeCounter();
@@ -33,6 +43,21 @@ console.log('lesson 2');
 // counter2(); // 1
 // counter(); // 3
 
+function makeCounter() {
+    let count = 0
+    return function() {
+        return ++count
+    }
+}
+
+const counter = makeCounter();
+console.log(counter()); // 1
+console.log(counter()); // 2
+const counter2 = makeCounter();
+console.log(counter2()); // 1
+console.log(counter()); // 3
+
+
 // Task 03
 // Переписать функцию из Task 02 так, что бы она принимала число в качестве аргумента и это число было стартовым значением счетчика
 // и возвращала следующий объект методов:
@@ -40,6 +65,77 @@ console.log('lesson 2');
 // decrease: -1
 // reset: установить счетчик в 0;
 // set: установить счетчик в заданное значение;
+
+function makeCounter2(startCount: number) {
+    return {
+        increase: () => ++startCount,
+        decrease: () => --startCount,
+        reset: () => {
+            startCount = 0
+            return startCount
+        },
+        set: (newCount: number) => {
+            startCount = newCount
+            return startCount
+        },
+        getCount: () => startCount
+    }
+}
+
+let counterTwo = makeCounter2(10)
+counterTwo.increase()
+counterTwo.increase()
+counterTwo.increase()
+console.log(counterTwo.getCount())
+let counterThree = makeCounter2(0)
+counterThree.set(100)
+counterThree.decrease()
+console.log(counterThree.getCount())
+counterTwo.increase()
+console.log(counterTwo.getCount())
+
+
+// Recursion
+
+// sumTo(1) = 1
+// sumTo(2) = 2 + 1 = 3
+// sumTo(3) = 3 + 2 + 1 = 6
+// sumTo(4) = 4 + 3 + 2 + 1 = 10
+// ...
+// sumTo(100) = 100 + 99 + ... + 2 + 1 = 5050
+
+/*function sumToByLoop(n: number) {
+    let result = 0
+    for( let i = n; i >= 0; i--) {
+        result += i;
+    }
+    return result
+}
+
+console.log(sumToByLoop(100))*/
+
+function sumTo(n: number): number {
+    if( n === 1 ) return n;
+    return n + sumTo( n - 1 )
+}
+
+console.log(sumTo(3))
+
+
+//
+// 1! = 1
+// 2! = 2 * 1 = 2
+// 3! = 3 * 2 * 1 = 6
+// 4! = 4 * 3 * 2 * 1 = 24
+// 5! = 5 * 4 * 3 * 2 * 1 = 120
+
+function factorial(n: number): number {
+    if (n === 1) return n
+    return n * factorial( n - 1)
+}
+
+console.log(factorial(5))
+
 
 // Task 04*
 // Реализовать функцию superSum которая принимает число в качестве аргумента, которое указывает на количество слагаемых
@@ -50,6 +146,29 @@ console.log('lesson 2');
 // 4) superSum(3)(2,5,3) //10
 // 5) superSum(3)(2,5)(3) //10
 // 6) superSum(3)(2,5)(3,9) //10
+
+function superSum(n: number): any {
+    if( n === 0 ) return 0
+    if( n === 1 ) return (num: number) => num
+
+    let _arguments: number[] = []
+
+    function helper(...args: number[]) {
+        _arguments = [..._arguments, ...args]
+        if(_arguments.length >= n ) {
+            return _arguments.reduce((acc,number) => acc + number)
+        } else {
+            return helper
+        }
+    }
+    return helper
+}
+
+console.log(superSum(0))
+console.log(superSum(3)(2)(5)(3))
+console.log(superSum(3)(2,5,3))
+
+
 
 // P.S. типизируйте только аргументы, а при вызове функции используйте @ts-ignore
 
